@@ -1,4 +1,7 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// Empty string = same origin. Right default for the single-container deploy,
+// where the backend serves this build as static files. Dev mode overrides via
+// frontend/.env (VITE_API_URL=http://localhost:3000) since Vite runs on its own port.
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 function authHeaders() {
   const token = localStorage.getItem('token');

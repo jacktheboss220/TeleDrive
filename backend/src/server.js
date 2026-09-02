@@ -1,3 +1,5 @@
+const path = require('node:path');
+const fs = require('node:fs');
 const express = require('express');
 const mongoose = require('mongoose');
 const env = require('./config/env');
@@ -26,6 +28,16 @@ app.use('/', uploadRoutes);
 app.use('/', fileRoutes);
 app.use('/', folderRoutes);
 app.use('/', tagRoutes);
+
+// Frontend build gets copied here at image-build time (see root Dockerfile).
+// Absent in plain `npm start` dev mode, where Vite serves the frontend itself.
+const PUBLIC_DIR = path.join(__dirname, '..', 'public');
+if (fs.existsSync(PUBLIC_DIR)) {
+  app.use(express.static(PUBLIC_DIR));
+  app.get(/^(?!\/(auth|files|folders|tags|upload|health)).*/, (req, res) => {
+    res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
+  });
+}
 
 app.use((err, req, res, next) => {
   console.error(err);
